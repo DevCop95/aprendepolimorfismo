@@ -241,6 +241,7 @@ h4, .btn, .tab-btn, .ability-title, .card-name, .combatant-name {
     flex-direction: column;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    min-width: 0;
 }
 
 .panel:hover {
@@ -385,7 +386,11 @@ h4, .btn, .tab-btn, .ability-title, .card-name, .combatant-name {
         display: none;
     }
     .selector-actions {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+    }
+    .select-field select {
+        font-size: 0.85rem;
+        padding-right: 1rem;
     }
 }
 
@@ -1799,6 +1804,7 @@ h4, .btn, .tab-btn, .ability-title, .card-name, .combatant-name {
     flex-direction: column;
     flex: 1;
     min-height: 0;
+    min-width: 0;
 }
 
 .tab-content.hidden {
