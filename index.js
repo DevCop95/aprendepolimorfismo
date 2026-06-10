@@ -2117,6 +2117,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const welcomeModal = document.getElementById("welcome-modal");
     const closeWelcome = () => {
         welcomeModal.classList.add("hidden");
+        // Iniciar tour de bienvenida automáticamente
+        setTimeout(startTour, 400);
     };
     document.getElementById("btn-close-welcome")?.addEventListener("click", closeWelcome);
     document.getElementById("btn-enter-arena")?.addEventListener("click", closeWelcome);
@@ -2152,7 +2154,107 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
     
+    // Eventos de la Guía Interactiva
+    document.getElementById("tour-badge")?.addEventListener("click", startTour);
+    document.getElementById("btn-tour-skip")?.addEventListener("click", stopTour);
+    document.getElementById("btn-tour-next")?.addEventListener("click", () => {
+        showTourStep(currentTourStep + 1);
+    });
+
     // Iniciar carga de la API
     fetchCharacters();
 });
+
+// --- LÓGICA DE LA GUÍA INTERACTIVA (ONBOARDING TOUR) ---
+const TOUR_STEPS = [
+    {
+        target: ".characters-panel",
+        text: "<strong>Paso 1: Seleccionar Personajes.</strong> Usa los selectores desplegables para elegir a tu Héroe y Adversario, o haz clic en <strong>'VS automático'</strong> para que el sistema elija una combinación por ti.",
+        scroll: "top"
+    },
+    {
+        target: ".arena-panel",
+        text: "<strong>Paso 2: Asignar a la Arena.</strong> Haz clic directo en las ranuras vacías (o en los botones '+' de arriba) para meter a tus personajes seleccionados a la Arena de Combate.",
+        scroll: "center"
+    },
+    {
+        target: "#btn-start-battle",
+        text: "<strong>Paso 3: Iniciar Combate.</strong> Una vez que ambos personajes estén cargados en sus ranuras, el botón verde <strong>'Iniciar Batalla'</strong> en el centro se activará. ¡Haz clic para comenzar el duelo!",
+        scroll: "center"
+    },
+    {
+        target: "#battle-actions-container",
+        text: "<strong>Paso 4: Ejecutar Habilidades.</strong> En el turno de tu personaje, el panel inferior de acciones se activará. Podrás seleccionar cualquiera de sus habilidades para atacar, sanar o defender.",
+        scroll: "center"
+    },
+    {
+        target: "#live-poly-container",
+        text: "<strong>Paso 5: Ver Polimorfismo en Vivo.</strong> Cada vez que realices un ataque o habilidad, aquí se explicará técnicamente el principio de Polimorfismo que acaba de ocurrir en tiempo de ejecución.",
+        scroll: "center"
+    },
+    {
+        target: ".inspector-panel",
+        text: "<strong>Paso 6: Inspeccionar el Código OOP.</strong> Revisa esta sección para examinar el código de la <strong>'Clase Base'</strong> y las <strong>'Subclases'</strong> específicas. Observa cómo el método <code>executeAction()</code> o <code>takeDamage()</code> es sobrescrito por cada tipo de personaje.",
+        scroll: "top"
+    }
+];
+
+let currentTourStep = 0;
+let tourActive = false;
+
+function startTour() {
+    currentTourStep = 0;
+    tourActive = true;
+    document.getElementById("tour-card").classList.remove("hidden");
+    showTourStep(0);
+}
+
+function stopTour() {
+    tourActive = false;
+    document.getElementById("tour-card").classList.add("hidden");
+    // Limpiar clases de pulso
+    document.querySelectorAll(".pulse-highlight").forEach(el => {
+        el.classList.remove("pulse-highlight");
+    });
+}
+
+function showTourStep(index) {
+    if (!tourActive || index < 0 || index >= TOUR_STEPS.length) {
+        stopTour();
+        return;
+    }
+
+    currentTourStep = index;
+
+    // Actualizar indicador
+    document.getElementById("tour-step-indicator").textContent = `${index + 1} de ${TOUR_STEPS.length}`;
+    document.getElementById("tour-card-text").innerHTML = TOUR_STEPS[index].text;
+
+    // Quitar clases previas de pulso
+    document.querySelectorAll(".pulse-highlight").forEach(el => {
+        el.classList.remove("pulse-highlight");
+    });
+
+    const step = TOUR_STEPS[index];
+    const targetEl = document.querySelector(step.target);
+    
+    if (targetEl) {
+        targetEl.classList.add("pulse-highlight");
+        
+        // Hacer scroll para ver el elemento destacado
+        targetEl.scrollIntoView({
+            behavior: "smooth",
+            block: step.scroll === "top" ? "start" : "center"
+        });
+    }
+
+    // Cambiar texto de botón al final
+    const nextBtn = document.getElementById("btn-tour-next");
+    if (index === TOUR_STEPS.length - 1) {
+        nextBtn.textContent = "Finalizar";
+    } else {
+        nextBtn.textContent = "Siguiente";
+    }
+}
+
 
