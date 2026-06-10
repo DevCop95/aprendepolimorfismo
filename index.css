@@ -1893,6 +1893,11 @@ h4, .btn, .tab-btn, .ability-title, .card-name, .combatant-name {
     align-items: flex-start;
 }
 
+.concept-step > div {
+    min-width: 0;
+    flex: 1;
+}
+
 .step-num {
     background: var(--color-primary);
     color: #141210;
