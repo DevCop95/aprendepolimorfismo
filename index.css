@@ -2644,9 +2644,31 @@ h4, .btn, .tab-btn, .ability-title, .card-name, .combatant-name {
 
 @media (max-width: 768px) {
     .tour-card {
-        bottom: 12px;
-        left: 12px;
-        right: 12px;
-        width: calc(100% - 24px);
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        border-top: 3px double var(--border-color) !important;
+        padding: 0.6rem 0.85rem !important;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5) !important;
+        gap: 0.4rem !important;
+    }
+    .tour-card-header {
+        display: none !important;
+    }
+    .tour-card-body {
+        font-size: 0.78rem !important;
+        line-height: 1.35 !important;
+    }
+    .tour-card-footer {
+        margin-top: 0.15rem !important;
+    }
+    .tour-card-footer .btn {
+        padding: 0.25rem 0.6rem !important;
+        font-size: 0.72rem !important;
     }
 }

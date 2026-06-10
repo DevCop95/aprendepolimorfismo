@@ -2228,7 +2228,12 @@ function showTourStep(index) {
 
     // Actualizar indicador
     document.getElementById("tour-step-indicator").textContent = `${index + 1} de ${TOUR_STEPS.length}`;
-    document.getElementById("tour-card-text").innerHTML = TOUR_STEPS[index].text;
+    
+    let text = TOUR_STEPS[index].text;
+    if (window.innerWidth <= 768) {
+        text = `<span style="font-family: 'Fira Code', monospace; font-size: 0.72rem; font-weight: 700; color: #8c6a3c; display: block; margin-bottom: 0.25rem; text-transform: uppercase;">Paso ${index + 1} de ${TOUR_STEPS.length}</span>` + text;
+    }
+    document.getElementById("tour-card-text").innerHTML = text;
 
     // Quitar clases previas de pulso
     document.querySelectorAll(".pulse-highlight").forEach(el => {
