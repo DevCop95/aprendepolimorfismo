@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RPG OOP Arena: Aplicación web interactiva que consume la API de personajes RPG de DevCop95/rpgdevAPI y demuestra los principios de Programación Orientada a Objetos y Polimorfismo en JavaScript.">
+    <title>RPG OOP Arena - Demostración de Polimorfismo</title>
+    <!-- Google Fonts: Outfit y Fira Code para el inspector de código -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="page-wrapper">
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fa-solid fa-dice-d20 logo-icon"></i>
+                <div>
+                    <h1>RPG OOP Arena</h1>
+                    <p class="subtitle">Explorando Polimorfismo en JS</p>
+                </div>
+            </div>
+            <div class="polymorphism-badge" id="info-badge">
+                <i class="fa-solid fa-graduation-cap"></i> ¿Qué es Polimorfismo?
+            </div>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <!-- Panel Izquierdo: Selección de Personajes -->
+        <section class="panel characters-panel" aria-labelledby="char-panel-title">
+            <h2 id="char-panel-title">
+                <span class="title-text"><i class="fa-solid fa-code-branch"></i> Selector VS</span>
+                <span class="api-status-group">
+                    <span class="api-status loaded" id="api-status"><i class="fa-solid fa-circle-check"></i> API Cargada</span>
+                    <button class="btn-api-help" id="btn-api-help" title="¿Cómo se conecta con la API?"><i class="fa-solid fa-circle-question"></i></button>
+                </span>
+            </h2>
+
+            <div class="character-selector">
+                <div class="select-field">
+                    <span><i class="fa-solid fa-shield-halved"></i> Héroe</span>
+                    <div class="custom-select-wrapper">
+                        <select id="player-select"></select>
+                        <i class="fa-solid fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+
+                <div class="duel-vs-chip">VS</div>
+
+                <div class="select-field">
+                    <span><i class="fa-solid fa-skull"></i> Adversario</span>
+                    <div class="custom-select-wrapper">
+                        <select id="enemy-select"></select>
+                        <i class="fa-solid fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-wide" id="btn-random-vs">
+                    <i class="fa-solid fa-dice-d20"></i> VS automático
+                </button>
+
+                <div class="selector-actions">
+                    <button class="btn btn-secondary btn-sm" id="btn-inspect-selected">
+                        <i class="fa-solid fa-code"></i> Inspeccionar
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="btn-sheet-selected">
+                        <i class="fa-solid fa-scroll"></i> Hoja
+                    </button>
+                </div>
+
+                <div class="selected-code-card" id="selected-code-card">
+                    <span class="code-card-kicker">Subclase activa</span>
+                    <strong id="selected-code-name">Character</strong>
+                    <code id="selected-code-signature">CharacterFactory.create(data)</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel Central: Arena de Combate -->
+        <section class="panel arena-panel" aria-labelledby="arena-title">
+            <h2 id="arena-title"><i class="fa-solid fa-swords"></i> Arena de Combate <span class="turn-indicator" id="current-turn-badge">Selecciona combatientes</span></h2>
+            
+            <!-- Zona de Combate -->
+            <div class="battlefield">
+                <!-- Equipo A (Jugador) -->
+                <div class="battle-team player-team" id="player-team">
+                    <div class="team-header">
+                        <h3>Equipo Héroe</h3>
+                        <button class="btn btn-secondary btn-sm" id="btn-add-player" disabled>
+                            <i class="fa-solid fa-plus"></i> Asignar Héroe
+                        </button>
+                    </div>
+                    <div class="team-slots" id="player-slots">
+                        <div class="empty-slot" data-team="player">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <p>Ranura Héroe 1</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Separador / Versus -->
+                <div class="vs-divider">
+                    <span class="vs-text">VS</span>
+                    <button class="btn btn-primary" id="btn-start-battle" disabled>
+                        <i class="fa-solid fa-gamepad"></i> Iniciar Batalla
+                    </button>
+                    <button class="btn btn-danger hidden" id="btn-reset-battle">
+                        <i class="fa-solid fa-rotate-left"></i> Reiniciar
+                    </button>
+                </div>
+
+                <!-- Equipo B (Enemigos) -->
+                <div class="battle-team enemy-team" id="enemy-team">
+                    <div class="team-header">
+                        <h3>Equipo Adversario</h3>
+                        <button class="btn btn-secondary btn-sm" id="btn-add-enemy" disabled>
+                            <i class="fa-solid fa-plus"></i> Asignar Enemigo
+                        </button>
+                    </div>
+                    <div class="team-slots" id="enemy-slots">
+                        <div class="empty-slot" data-team="enemy">
+                            <i class="fa-solid fa-skull"></i>
+                            <p>Ranura Enemigo 1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Turno y Acciones -->
+            <div class="actions-panel disabled" id="battle-actions-container">
+                <div class="active-character-info">
+                    <div class="active-char-avatar-wrapper hidden" id="active-char-avatar-wrapper">
+                        <img id="active-char-avatar" src="" alt="Turno del Personaje">
+                    </div>
+                    <div>
+                        <h4 id="active-char-name">Esperando inicio...</h4>
+                        <p id="active-char-type">Selecciona una habilidad para ejecutar</p>
+                    </div>
+                </div>
+                <div class="abilities-grid" id="abilities-container">
+                    <!-- Botones de habilidad dinámicos -->
+                </div>
+            </div>
+
+            <!-- Explicación en Vivo del Polimorfismo Ejecutado -->
+            <div class="live-poly-explanation-container" id="live-poly-container">
+                <div class="live-poly-header">
+                    <h4><i class="fa-solid fa-scroll"></i> Pergamino del Hechicero: Polimorfismo en Acción</h4>
+                </div>
+                <div class="live-poly-body" id="live-poly-explanation-text">
+                    La batalla no ha comenzado. Elige tus combatientes en la arena y ejecuta acciones para ver cómo se aplica el polimorfismo dinámicamente en tiempo de ejecución.
+                </div>
+            </div>
+
+            <!-- Consola de Eventos y Registro de Polimorfismo -->
+            <div class="combat-log-container">
+                <div class="combat-log-header">
+                    <h4><i class="fa-solid fa-terminal"></i> Consola del Sistema e Historial</h4>
+                    <button class="btn-clear" id="btn-clear-log"><i class="fa-solid fa-trash-can"></i> Limpiar</button>
+                </div>
+                <div class="combat-log" id="combat-log">
+                    <div class="log-entry system-entry">Cargando personajes desde la API de DevCop95...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel Derecho: Inspector de Código OOP y Conceptos -->
+        <section class="panel inspector-panel" aria-labelledby="inspector-title">
+            <div class="inspector-header">
+                <h2 id="inspector-title"><i class="fa-solid fa-code"></i> Inspector OOP</h2>
+                <button class="btn btn-secondary btn-sm" id="btn-auto-select" title="Auto-seleccionar escenario aleatorio">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto
+                </button>
+            </div>
+
+            <div class="inspector-tabs">
+                <button class="tab-btn active" data-tab="explanation">Explicación</button>
+                <button class="tab-btn" data-tab="base-class">Clase Base</button>
+                <button class="tab-btn" data-tab="subclass" id="subclass-tab-btn">Subclase</button>
+            </div>
+
+            <div class="tab-content" id="tab-explanation">
+                <div class="poly-explanation-box">
+                    <h3>¿Cómo funciona el Polimorfismo aquí?</h3>
+                    <p>En este simulador, cada clase de personaje se modela usando Programación Orientada a Objetos en JavaScript.</p>
+                    
+                    <div class="concept-step">
+                        <span class="step-num">1</span>
+                        <div>
+                            <strong>Herencia Común:</strong> Todos heredan de la clase base <code>Character</code>. Esto significa que todos tienen la propiedad <code>stats</code> y los métodos <code>executeAction()</code> y <code>takeDamage()</code>.
+                        </div>
+                    </div>
+
+                    <div class="concept-step">
+                        <span class="step-num">2</span>
+                        <div>
+                            <strong>Sobrescritura de Métodos:</strong> Cada personaje redefine (sobrescribe) estos métodos.
+                            <ul>
+                                <li>El <strong>Guerrero</strong> sobrescribe <code>takeDamage</code> para aplicar su 40% de bloqueo con escudo.</li>
+                                <li>El <strong>Mago</strong> sobrescribe <code>executeAction</code> para validar y consumir maná al lanzar hechizos mágicos.</li>
+                                <li>El <strong>Clérigo</strong> y la <strong>Curandera</strong> sobrescriben <code>executeAction</code> para curar aliados en lugar de dañar enemigos.</li>
+                                <li>El <strong>Berserker</strong> sobrescribe <code>takeDamage</code> para aumentar su ataque al perder salud.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="concept-step">
+                        <span class="step-num">3</span>
+                        <div>
+                            <strong>Llamada Polimórfica:</strong> Durante el combate, el motor de juego ejecuta la misma línea de código:
+                            <pre><code class="language-js">personajeActivo.executeAction(habilidadIndex, objetivo)</code></pre>
+                            El motor no sabe ni le importa el tipo exacto del personaje. JavaScript busca dinámicamente y ejecuta el comportamiento correspondiente a la subclase específica del personaje. ¡Eso es polimorfismo!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="tab-base-class">
+                <p class="code-desc">Esta es la clase base <code>Character</code> de la que heredan todos los personajes de la arena.</p>
+                <pre class="code-container"><code class="language-js" id="base-class-code">
+class Character {
+    constructor(data) {
+        this.id = data.id;
+        this.nombre = data.nombre;
+        this.name = data.name;
+        this.stats = { ...data.stats };
+        this.maxHp = data.stats.hp;
+        this.maxMana = data.stats.mana;
+        this.hp = data.stats.hp;
+        this.mana = data.stats.mana;
+        this.habilidades = data.habilidades;
+        this.imagenes = data.imagenes;
+    }
+
+    // Método Base de Daño
+    takeDamage(amount, type = "physical") {
+        let finalDamage = Math.max(1, amount - this.stats.defense);
+        this.hp = Math.max(0, this.hp - finalDamage);
+        return { damage: finalDamage, absorbed: 0, effects: [] };
+    }
+
+    // Método Base de Acción
+    executeAction(abilityIndex, target) {
+        const ability = this.habilidades[abilityIndex];
+        const damage = ability.base_damage || ability.danio_base || 0;
+        
+        // Llamada polimórfica a takeDamage en el objetivo
+        const result = target.takeDamage(damage, "physical");
+        return {
+            abilityName: ability.nombre,
+            text: `${this.nombre} usa ${ability.nombre} sobre ${target.nombre} causando ${result.damage} de daño físico.`
+        };
+    }
+}
+                </code></pre>
+            </div>
+
+            <div class="tab-content hidden" id="tab-subclass">
+                <div class="subclass-inspector-header">
+                    <h3 id="inspector-subclass-title">Guerrero (Subclase)</h3>
+                    <p class="code-desc">Muestra la implementación específica que sobrescribe la clase base.</p>
+                </div>
+                <pre class="code-container"><code class="language-js" id="subclass-code">
+// Selecciona un personaje de la biblioteca para ver su código
+                </code></pre>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal informativo sobre Polimorfismo -->
+    <div class="modal hidden" id="info-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> Entendiendo el Polimorfismo</h2>
+                <button class="close-modal" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>El <strong>Polimorfismo</strong> (del griego <em>poly</em> = muchas, <em>morph</em> = formas) es uno de los pilares de la programación orientada a objetos.</p>
+                
+                <h3>En este Proyecto:</h3>
+                <ul>
+                    <li><strong>Una sola interfaz:</strong> Las acciones del juego interactúan con los personajes mediante un método común: <code>personaje.executeAction()</code>.</li>
+                    <li><strong>Múltiples comportamientos:</strong> Cuando se presiona una habilidad, no hacemos condicionales complejos como:
+                        <pre><code>if (esMago) { lanzarHechizo() } else if (esGuerrero) { usarEscudo() }</code></pre>
+                        En su lugar, simplemente llamamos al método común y dejamos que cada objeto responda según su propia clase heredada.
+                    </li>
+                </ul>
+
+                <h3>Beneficios:</h3>
+                <ol>
+                    <li><strong>Extensibilidad:</strong> Si quisiéramos añadir una nueva clase, por ejemplo un <em>Arquero</em> o un <em>Nigromante</em> en el futuro, solo necesitaríamos crear una nueva subclase sin modificar el código de la arena o del simulador.</li>
+                    <li><strong>Limpieza de Código:</strong> Evita largas y confusas cadenas de <code>switch</code> o <code>if/else</code>.</li>
+                    <li><strong>Encapsulación:</strong> Cada personaje gestiona sus propias reglas de combate, daños y recursos.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hoja de Personaje (Detalles) -->
+    <div class="modal hidden" id="char-sheet-modal">
+        <div class="modal-content parchment-content">
+            <div class="modal-header parchment-header">
+                <h2 id="sheet-char-name">Hoja de Personaje</h2>
+                <button class="close-modal" id="btn-close-sheet">&times;</button>
+            </div>
+            <div class="modal-body parchment-body">
+                <div class="sheet-main-info">
+                    <div class="sheet-portrait-frame">
+                        <img id="sheet-char-portrait" src="" alt="Retrato del Héroe">
+                    </div>
+                    <div class="sheet-text-details">
+                        <h3 id="sheet-char-title" class="char-title-gold">Título</h3>
+                        <p class="sheet-meta-row">
+                            <span id="sheet-char-type">Tipo</span> | 
+                            <span id="sheet-char-element">Elemento</span> | 
+                            <span id="sheet-char-rarity">Rareza</span>
+                        </p>
+                        <blockquote id="sheet-char-lore" class="parchment-quote">
+                            Lore...
+                        </blockquote>
+                    </div>
+                </div>
+
+                <div class="sheet-stats-section">
+                    <h4>Estadísticas de Atributos</h4>
+                    <div class="sheet-stats-grid" id="sheet-stats-container">
+                        <!-- Creado dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="sheet-abilities-section">
+                    <h4>Habilidades Especiales</h4>
+                    <div class="sheet-abilities-list" id="sheet-abilities-container">
+                        <!-- Creado dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="sheet-pros-cons-grid">
+                    <div class="sheet-section-half">
+                        <h4 class="text-green"><i class="fa-solid fa-shield-halved"></i> Fortalezas</h4>
+                        <ul id="sheet-char-strengths" class="pros-list"></ul>
+                    </div>
+                    <div class="sheet-section-half">
+                        <h4 class="text-red"><i class="fa-solid fa-skull-crossbones"></i> Debilidades</h4>
+                        <ul id="sheet-char-weaknesses" class="cons-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de explicación de la conexión API -->
+    <div class="modal hidden" id="api-help-modal">
+        <div class="modal-content parchment-content">
+            <div class="modal-header parchment-header">
+                <h2><i class="fa-solid fa-network-wired"></i> Conexión con la API DevCop95</h2>
+                <button class="close-modal" id="btn-close-api-help">&times;</button>
+            </div>
+            <div class="modal-body parchment-body">
+                <h3>¿Cómo se conecta este simulador con la API?</h3>
+                <p>Esta aplicación interactiva consume datos dinámicos en formato JSON directamente del repositorio público de <strong>DevCop95/rpgdevAPI</strong>. A continuación se explica el proceso técnico paso a paso:</p>
+                
+                <div class="concept-step">
+                    <span class="step-num">1</span>
+                    <div>
+                        <strong>Endpoints consumidos:</strong>
+                        <p>Primero, se lee el índice general <code>index.json</code> para verificar el estado de los personajes. Luego, se realiza un <code>fetch()</code> a cada archivo JSON de personaje:</p>
+                        <pre><code>https://raw.githubusercontent.com/DevCop95/rpgdevAPI/main/data/{personaje}.json</code></pre>
+                    </div>
+                </div>
+
+                <div class="concept-step">
+                    <span class="step-num">2</span>
+                    <div>
+                        <strong>Estructura del JSON:</strong>
+                        <p>El servidor devuelve un objeto con propiedades del personaje (stats, habilidades, imágenes, historia, fortalezas, debilidades):</p>
+                        <pre><code class="language-json">{
+  "id": "guerrero",
+  "nombre": "Guerrero",
+  "titulo": "Defensor Inquebrantable",
+  "stats": { "hp": 1100, "mana": 80, "defense": 35 },
+  "fortalezas": [ "Alta Supervivencia", "Mitigación con Escudo" ],
+  "habilidades": [ { "nombre": "Muro de Escudos", "danio_base": 0 } ]
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="concept-step">
+                    <span class="step-num">3</span>
+                    <div>
+                        <strong>Procesamiento en JavaScript (Polimorfismo):</strong>
+                        <p>Una vez descargados los datos con <code>fetch()</code>, pasamos el JSON a nuestro <code>CharacterFactory</code>:</p>
+                        <pre><code class="language-js">const personaje = CharacterFactory.create(data);</code></pre>
+                        <p>El Factory analiza el <code>data.id</code> e instanciará la subclase correspondiente (<code>Warrior</code>, <code>Mage</code>, etc.). Esto permite que cada personaje sobrescriba sus propios métodos de combate, aplicando Polimorfismo puro en tiempo de ejecución.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Bienvenida (Se muestra al entrar) -->
+    <div class="modal" id="welcome-modal">
+        <div class="modal-content parchment-content welcome-modal-content">
+            <div class="modal-header parchment-header welcome-modal-header">
+                <h2>
+                    <i class="fa-solid fa-dice-d20 logo-icon"></i>
+                    <span>RPG OOP Arena</span>
+                </h2>
+                <button class="close-modal" id="btn-close-welcome">&times;</button>
+            </div>
+            <div class="modal-body parchment-body welcome-modal-body">
+                <div class="welcome-intro">
+                    <h3>¡Bienvenido al Simulador de Polimorfismo!</h3>
+                    <p>
+                        Esta aplicación interactiva consume datos en tiempo real de la API de personajes RPG de 
+                        <strong>DevCop95/rpgdevAPI</strong> para explorar de forma didáctica los principios de 
+                        <strong>Programación Orientada a Objetos (OOP)</strong> y <strong>Polimorfismo</strong> en JavaScript.
+                    </p>
+                </div>
+
+                <div class="welcome-classes-section">
+                    <h4><i class="fa-solid fa-swords"></i> Las Clases de la Arena</h4>
+                    <div class="welcome-classes-grid">
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-shield-halved"></i> Guerrero</strong>
+                            <span>El defensor principal. Sobrescribe la defensa para bloquear daño físico con su escudo.</span>
+                        </div>
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-fire"></i> Berserker</strong>
+                            <span>Furia desatada. Su daño escala de forma polimórfica a medida que pierde salud.</span>
+                        </div>
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-wand-magic-sparkles"></i> Mago</strong>
+                            <span>Hechicero. Consume maná para lanzar potentes conjuros mágicos que ignoran defensa física.</span>
+                        </div>
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-circle-plus"></i> Clérigo</strong>
+                            <span>Soporte híbrido. Cura a sus aliados y conjura escudos de luz de absorción temporal.</span>
+                        </div>
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-leaf"></i> Curandera</strong>
+                            <span>Sanadora pura. Su curación tiene un bono de salud crítica si el objetivo tiene menos de 35% HP.</span>
+                        </div>
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-mask"></i> Ninja</strong>
+                            <span>Ágil y mortal. Tiene probabilidad pasiva de esquivar ataques y ejecuta dobles golpes críticos.</span>
+                        </div>
+                        <div class="welcome-class-item">
+                            <strong class="text-gold"><i class="fa-solid fa-cross"></i> Templario</strong>
+                            <span>Paladín sagrado. Absorbe daño con barreras sagradas y refleja el 20% del daño de vuelta.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="welcome-repo-section">
+                    <h4><i class="fa-solid fa-database"></i> Origen de los Datos</h4>
+                    <p>
+                        Los datos de los personajes, estadísticas y retratos pixel art son cargados directamente desde la API pública del repositorio:
+                    </p>
+                    <a href="https://github.com/DevCop95/rpgdevAPI" target="_blank" rel="noopener noreferrer" class="welcome-repo-link">
+                        <i class="fa-brands fa-github repo-github-icon"></i>
+                        <span>github.com/DevCop95/rpgdevAPI</span>
+                    </a>
+                </div>
+
+                <div class="welcome-footer">
+                    <button class="btn btn-primary btn-wide" id="btn-enter-arena">
+                        <i class="fa-solid fa-gamepad"></i> Entrar a la Arena
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <p>RPG OOP Arena &copy; 2026 - Creado con fines didácticos. Datos de personajes proporcionados por la API pública de <a href="https://github.com/DevCop95/rpgdevAPI" target="_blank" rel="noopener noreferrer">DevCop95/rpgdevAPI</a>.</p>
+    </footer>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
